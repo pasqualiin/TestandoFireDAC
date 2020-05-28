@@ -1,0 +1,190 @@
+object DM: TDM
+  OldCreateOrder = False
+  OnCreate = DataModuleCreate
+  Height = 269
+  Width = 587
+  object DvmConnection: TFDConnection
+    Params.Strings = (
+      'ConnectionDef=DVM')
+    LoginPrompt = False
+    Left = 135
+    Top = 64
+  end
+  object ClienteTable: TFDQuery
+    Connection = DvmConnection
+    UpdateOptions.AssignedValues = [uvGeneratorName]
+    UpdateOptions.GeneratorName = 'GEN_CLIENTE'
+    UpdateOptions.AutoIncFields = 'ID_CLIENTE'
+    SQL.Strings = (
+      'SELECT * FROM CLIENTE')
+    Left = 314
+    Top = 54
+    object ClienteTableID_CLIENTE: TFDAutoIncField
+      FieldName = 'ID_CLIENTE'
+      Origin = 'ID_CLIENTE'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      IdentityInsert = True
+    end
+    object ClienteTableCODIGO: TIntegerField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      Required = True
+    end
+    object ClienteTableNOME: TStringField
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      Size = 60
+    end
+  end
+  object ProdutoTable: TFDQuery
+    Connection = DvmConnection
+    UpdateOptions.KeyFields = 'ID_PRODUTO'
+    UpdateOptions.AutoIncFields = 'ID_PRODUTO'
+    SQL.Strings = (
+      'SELECT * FROM PRODUTO')
+    Left = 310
+    Top = 153
+    object ProdutoTableID_PRODUTO: TIntegerField
+      FieldName = 'ID_PRODUTO'
+      Origin = 'ID_PRODUTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object ProdutoTableCODIGO: TStringField
+      FieldName = 'CODIGO'
+      Origin = 'CODIGO'
+      Required = True
+      Size = 13
+    end
+    object ProdutoTableDESCRICAO: TStringField
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      Required = True
+      Size = 60
+    end
+    object ProdutoTableVALOR: TBCDField
+      FieldName = 'VALOR'
+      Origin = 'VALOR'
+      Required = True
+      Precision = 18
+      Size = 2
+    end
+  end
+  object PedidoTable: TFDQuery
+    Connection = DvmConnection
+    UpdateOptions.AssignedValues = [uvGeneratorName]
+    UpdateOptions.GeneratorName = 'GEN_PEDIDO'
+    UpdateOptions.AutoIncFields = 'ID_PEDIDO'
+    SQL.Strings = (
+      'SELECT'
+      '    P.*,'
+      '    C.nome'
+      'FROM'
+      '    pedido P'
+      '    INNER JOIN CLIENTE C ON'
+      '        C.id_cliente = P.id_cliente;')
+    Left = 487
+    Top = 69
+    object PedidoTableID_PEDIDO: TFDAutoIncField
+      FieldName = 'ID_PEDIDO'
+      Origin = 'ID_PEDIDO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      IdentityInsert = True
+    end
+    object PedidoTableNUMERO: TIntegerField
+      FieldName = 'NUMERO'
+      Origin = 'NUMERO'
+    end
+    object PedidoTableDATA: TDateField
+      DefaultExpression = 'NOW()'
+      FieldName = 'DATA'
+      Origin = '"DATA"'
+      Required = True
+    end
+    object PedidoTableID_CLIENTE: TIntegerField
+      FieldName = 'ID_CLIENTE'
+      Origin = 'ID_CLIENTE'
+      Required = True
+    end
+    object PedidoTableNOME: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'NOME'
+      Origin = 'NOME'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 60
+    end
+  end
+  object ItemTable: TFDQuery
+    IndexFieldNames = 'ID_PEDIDO'
+    MasterSource = DSPEDIDO
+    MasterFields = 'ID_PEDIDO'
+    DetailFields = 'ID_PEDIDO'
+    Connection = DvmConnection
+    UpdateOptions.AssignedValues = [uvGeneratorName]
+    UpdateOptions.GeneratorName = 'GEN_ITENS'
+    UpdateOptions.AutoIncFields = 'ID_ITEM'
+    SQL.Strings = (
+      'SELECT'
+      '    i.*,'
+      '    P.descricao'
+      'FROM'
+      '    item I'
+      '    INNER JOIN produto p ON'
+      '        P.id_produto= I.id_produto'
+      'WHERE'
+      '    I.id_pedido = :ID_PEDIDO;')
+    Left = 495
+    Top = 168
+    ParamData = <
+      item
+        Name = 'ID_PEDIDO'
+        DataType = ftAutoInc
+        ParamType = ptInput
+        Value = Null
+      end>
+    object ItemTableID_ITEM: TFDAutoIncField
+      FieldName = 'ID_ITEM'
+      Origin = 'ID_ITEM'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      IdentityInsert = True
+    end
+    object ItemTableORDEM: TIntegerField
+      FieldName = 'ORDEM'
+      Origin = 'ORDEM'
+    end
+    object ItemTableID_PRODUTO: TIntegerField
+      FieldName = 'ID_PRODUTO'
+      Origin = 'ID_PRODUTO'
+      Required = True
+    end
+    object ItemTableQTD: TIntegerField
+      FieldName = 'QTD'
+      Origin = 'QTD'
+    end
+    object ItemTableVLUN: TBCDField
+      FieldName = 'VLUN'
+      Origin = 'VLUN'
+      Precision = 18
+      Size = 2
+    end
+    object ItemTableID_PEDIDO: TIntegerField
+      FieldName = 'ID_PEDIDO'
+      Origin = 'ID_PEDIDO'
+      Required = True
+    end
+    object ItemTableDESCRICAO: TStringField
+      AutoGenerateValue = arDefault
+      FieldName = 'DESCRICAO'
+      Origin = 'DESCRICAO'
+      ProviderFlags = []
+      ReadOnly = True
+      Size = 60
+    end
+  end
+  object DSPEDIDO: TDataSource
+    DataSet = PedidoTable
+    Left = 544
+    Top = 136
+  end
+end
